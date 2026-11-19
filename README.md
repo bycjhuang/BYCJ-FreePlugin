@@ -1,6 +1,6 @@
 # RefOverlay 参考图叠加器
 
-> 一个 **38 KB 的单文件小工具**：把任意一张图变成可以缩放、旋转、调透明度、还能**鼠标穿透**的半透明浮层，盖在 SketchUp / Rhino / Photoshop / D5 / Enscape 等任意窗口之上，用来比对透视、对相机角度。
+> 一个 **40 KB 的单文件小工具**：把任意一张图变成可以缩放、旋转、调透明度、还能**鼠标穿透**的半透明浮层，盖在 SketchUp / Rhino / Photoshop / D5 / Enscape 等任意窗口之上，用来比对透视、对相机角度。
 >
 > 由 [不囿成建 BYCJ Design](https://ai.bycjdesign.com/) 免费发布，MIT 协议。
 
