@@ -1,0 +1,14 @@
+# 编译中间产物
+*.pdb
+*.mdb
+*.cache
+bin/
+obj/
+.vs/
+*.user
+*.suo
+
+# 本地测试用图
+_t/
+_*.png
+!界面预览.png
