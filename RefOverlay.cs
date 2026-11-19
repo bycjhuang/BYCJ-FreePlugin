@@ -988,9 +988,15 @@ namespace RefOverlay
         private Label _lblOpVal, _lblZoomVal, _lblStatus, _lblHint;
         private RsAdStrip _ad;
 
-        // 推广入口：ref 参数用于后台区分来路。若你的注册流程用的是别的参数名（如 ?invite= / ?from=），
-        // 只改这一行即可，不需要动别的地方。
-        private const string AdUrl = "https://ai.bycjdesign.com/?ref=bycj-freeplugin&utm_source=freeplugin&utm_medium=win";
+        // ---- 推广归因 ----------------------------------------------------------
+        // 插件用两条路径把「来源」告诉站点，两条都指向同一个邀请码：
+        //   1) 点推广条 → 打开带参数的落地页（?ref=BYCJPLUGIN），站点读参数即可归因；
+        //   2) 右键推广条 → 复制邀请码，用户在注册页手动填写也能归因（防丢参数）。
+        // 站点侧要实现的事见 README「归因约定」，改协议只动下面三行。
+        internal const string RefCode = "BYCJPLUGIN";
+        private const string AdBase = "https://ai.bycjdesign.com/";
+        private static readonly string AdUrl =
+            AdBase + "?ref=" + RefCode + "&utm_source=freeplugin&utm_medium=desktop&utm_campaign=free2026";
         private Timer _grabTimer;
         private int _countdown;
         private bool _sync;
@@ -1097,7 +1103,9 @@ namespace RefOverlay
             // ---- 底部：推广条（免费 AI 生图入口）----
             _ad = new RsAdStrip();
             _ad.SetBounds(14, 292, 538, 30);
+            _ad.Note = "新用户注册送 500 积分 · 邀请码 " + RefCode;
             _ad.Click += delegate { OpenAd(); };
+            _ad.MouseUp += OnAdMouseUp;
 
             Controls.AddRange(new Control[] {
                 _btnMin, _btnClose,
@@ -1120,6 +1128,7 @@ namespace RefOverlay
             _tips.SetToolTip(_btnBlink, "在当前透明度和 0% 之间来回切换，靠闪动找角度差");
             _tips.SetToolTip(_btnHide, "临时藏起浮层（Ctrl+Alt+H 同效）");
             _tips.SetToolTip(_btnFit, "按比例铺满当前屏幕（Ctrl+Alt+F 同效）");
+            _tips.SetToolTip(_ad, "点击打开 ai.bycjdesign.com（邀请码 " + RefCode + "，新注册送 500 积分）；右键可复制邀请码");
 
             _btnOpen.Click += OnOpen;
             _btnGrab.Click += OnGrabUnderCursor;
@@ -1255,12 +1264,43 @@ namespace RefOverlay
             try
             {
                 Process.Start(AdUrl);
-                SetStatus("已打开浏览器：ai.bycjdesign.com（新注册送 500 积分）");
+                SetStatus("已打开浏览器：ai.bycjdesign.com（邀请码 " + RefCode + "，新注册送 500 积分）");
             }
             catch (Exception ex)
             {
                 SetStatus("打开链接失败：" + ex.Message);
             }
+        }
+
+        // 右键推广条：复制邀请码 / 打开站点。参数在某些浏览器或复制分享时会丢，
+        // 给用户一个手填的兜底，归因不会因为「参数丢失」而断掉。
+        private void OnAdMouseUp(object sender, MouseEventArgs e)
+        {
+            if (e.Button != MouseButtons.Right) return;
+
+            ContextMenuStrip menu = new ContextMenuStrip();
+            menu.ShowImageMargin = false;
+            menu.RenderMode = ToolStripRenderMode.System;
+            menu.Font = new Font("Microsoft YaHei UI", 9f, FontStyle.Regular, GraphicsUnit.Point);
+
+            ToolStripMenuItem copy = new ToolStripMenuItem("复制邀请码：" + RefCode);
+            copy.Click += delegate
+            {
+                try
+                {
+                    Clipboard.SetText(RefCode);
+                    SetStatus("邀请码已复制：" + RefCode + "（注册时填写可领 500 积分）");
+                }
+                catch (Exception ex) { SetStatus("复制失败：" + ex.Message); }
+            };
+
+            ToolStripMenuItem open = new ToolStripMenuItem("打开 ai.bycjdesign.com");
+            open.Click += delegate { OpenAd(); };
+
+            menu.Items.Add(copy);
+            menu.Items.Add(new ToolStripSeparator());
+            menu.Items.Add(open);
+            menu.Show(_ad, e.Location);
         }
 
         // ---- 打开 / 拖入 / 抓取
