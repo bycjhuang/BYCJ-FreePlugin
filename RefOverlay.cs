@@ -929,7 +929,7 @@ namespace RefOverlay
     internal sealed class RsAdStrip : Control
     {
         public string Headline = "免费 AI 生图";
-        public string Note = "新用户注册送 500 积分";
+        public string Note = "新用户注册送 200 积分";
         public string Action = "前往 →";
 
         private static readonly Font FHead = new Font("Microsoft YaHei UI", 9.5f, FontStyle.Bold, GraphicsUnit.Point);
@@ -1255,7 +1255,7 @@ namespace RefOverlay
             try
             {
                 Process.Start(AdUrl);
-                SetStatus("已打开浏览器：ai.bycjdesign.com（新注册送 500 积分）");
+                SetStatus("已打开浏览器：ai.bycjdesign.com（新注册送 200 积分）");
             }
             catch (Exception ex)
             {
